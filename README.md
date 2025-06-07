@@ -28,7 +28,7 @@ You can access the frontend deployment at:
 https://vineetg2003-llm---retrieval-augmented-genera-frontendapp-sqpnux.streamlit.app/
 
 - Note:
-This frontend link fetches data from your local PC backend. So you must run the backend server on http://localhost:8000 simultaneously using the command below for the frontend to work properly:
+**This frontend link fetches data from your local PC backend. So you must run the backend server on http://localhost:8000 simultaneously using the command below for the frontend to work properly:**
 
 ```bash
 uvicorn app.main:app --reload
