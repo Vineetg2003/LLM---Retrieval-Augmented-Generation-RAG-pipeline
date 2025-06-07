@@ -1,0 +1,6 @@
+# Ignore embeddings and models
+faiss_index.bin
+chunks.json
+*.bin
+*.pth
+venv/

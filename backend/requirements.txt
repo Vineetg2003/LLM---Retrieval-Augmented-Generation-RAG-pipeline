@@ -1,0 +1,33 @@
+# FastAPI + Dev
+fastapi
+uvicorn
+python-multipart
+
+# PDF Processing
+PyPDF2
+pdf2image
+pytesseract
+pillow
+pdf2image
+
+sentence_transformers
+
+# Vector DB + Embedding
+faiss-cpu
+sentence-transformers
+numpy
+hf_xet
+pdfplumber
+pytesseract
+
+# LLM
+torch
+transformers
+accelerate
+bitsandbytes
+nltk
+
+# Optional Utilities (use if required)
+python-dotenv
+loguru
+tqdm
