@@ -1,30 +1,25 @@
 import streamlit as st
-import requests
-import time
+from utils import upload_pdf, query_llm
 
-st.title("RAG PDF Query ASSIGNMENT")
+st.set_page_config(page_title="RAG Assistant", layout="centered")
 
-query = st.text_input("Enter your question:")
+st.title("📄 Retrieval-Augmented Generation (RAG) Assistant")
 
-if st.button("Submit"):
-    if not query.strip():
-        st.warning("Please enter a question before submitting.")
-    else:
-        with st.spinner("Searching documents..."):
-            try:
-                start_time = time.time()
-                # Updated backend URL with /api prefix
-                res = requests.post("http://localhost:8000/api/query/", data={"question": query})
+# Upload Section
+st.header("Upload Documents")
+uploaded_file = st.file_uploader("Upload PDF", type=["pdf"])
 
-                response_json = res.json()
+if uploaded_file:
+    with st.spinner("Uploading and indexing..."):
+        result = upload_pdf(uploaded_file)
+    st.success(result.get("message", "Uploaded successfully."))
 
-                st.markdown(f"**Answer ({(time.time() - start_time):.2f}s):**")
+# Query Section
+st.header("Ask a Question")
+query = st.text_input("Type your question:")
 
-                if "answer" in response_json:
-                    st.write(response_json["answer"])
-                else:
-                    st.error("Backend response does not contain an 'answer' field.")
-                    st.json(response_json)  # Show full response for debugging
-
-            except requests.exceptions.RequestException as e:
-                st.error(f"Backend error: {str(e)}")
+if st.button("Get Answer") and query:
+    with st.spinner("Thinking..."):
+        result = query_llm(query)
+    st.markdown("### 💬 Answer")
+    st.write(result.get("answer", "No answer returned."))

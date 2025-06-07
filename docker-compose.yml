@@ -1,20 +1,18 @@
+version: '3.8'
+
 services:
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.backend
+      context: ./backend
+      dockerfile: ../Dockerfile.backend
     ports:
       - "8000:8000"
-    environment:
-      - DEVICE=cuda  # Enable GPU if available
 
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: ../Dockerfile.frontend
     ports:
       - "8501:8501"
     depends_on:
       - backend
-    environment:
-      - BACKEND_URL=http://backend:8000  # Use service name for internal DNS

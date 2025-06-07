@@ -26,8 +26,7 @@ class VectorStore:
             json.dump(self.chunks, f)
 
     def embed_chunks(self, chunks: List[str]) -> np.ndarray:
-        embeddings = self.model.encode(chunks, convert_to_numpy=True, normalize_embeddings=True)
-        return embeddings
+        return self.model.encode(chunks, convert_to_numpy=True, normalize_embeddings=True)
 
     def add_documents(self, chunks: List[str]):
         embeddings = self.embed_chunks(chunks)
@@ -41,5 +40,10 @@ class VectorStore:
         query_embedding = self.model.encode([query], convert_to_numpy=True, normalize_embeddings=True)
         distances, indices = self.index.search(query_embedding, k)
         return [(self.chunks[i], float(dist)) for i, dist in zip(indices[0], distances[0]) if i < len(self.chunks)]
+    
+    def similarity_search(self, query: str, k: int = 5) -> List[str]:
+        results = self.similarity_search_with_score(query, k)
+        return [chunk for chunk, _ in results]
+
 
 vector_store = VectorStore()
