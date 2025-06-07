@@ -19,7 +19,7 @@ The system leverages:
 
 ## 🖼️ Frontend Screenshot
 
-![Frontend UI Screenshot](UI_RAG_ASSISTANT.png)
+![Frontend UI Screenshot](RAGIMAGE.png)
 
 ---
 
@@ -29,6 +29,10 @@ https://vineetg2003-llm---retrieval-augmented-genera-frontendapp-sqpnux.streamli
 
 - Note:
 This frontend link fetches data from your local PC backend. So you must run the backend server on http://localhost:8000 simultaneously using the command below for the frontend to work properly:
+
+```bash
+uvicorn app.main:app --reload
+```
 
 ---
 
@@ -124,6 +128,8 @@ For better performance:
 ```bash
 pytest tests/
 
+```
+
 ---
 
 ## ⚙️ Configuring Different LLM Providers
@@ -147,6 +153,7 @@ MODEL_NAME = "your-chosen-llm-model"
 curl -X POST "http://localhost:8000/api/upload/" \
   -H "accept: application/json" \
   -F "file=@yourfile.pdf"
+```
 
 ### ❓ Query the Uploaded Content
 
@@ -169,6 +176,8 @@ curl -X POST "http://localhost:8000/api/query/" \
   "answer": "The project deadline is June 30, 2025."
 }
 
+```
+
 ---
 
 ## 🐳 Docker Setup & Deployment Guide
@@ -187,3 +196,5 @@ Verify installation:
 ```bash
 docker --version
 docker-compose --version
+
+```
