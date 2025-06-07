@@ -17,6 +17,10 @@ The system leverages:
 
 ---
 
+## 🔗 Live Demo
+
+[Click here to view the demo](https://drive.google.com/file/d/12DdhZ9Npyastx-NuH73bAoCxmT7pVYEj/view?usp=sharing)
+
 ## 🖼️ Frontend Screenshot
 
 ![Frontend UI Screenshot](RAGIMAGE.png)
@@ -57,6 +61,16 @@ uvicorn app.main:app --reload
 | LLM              | `google/flan-t5-base` (Transformers)    |
 | Frontend         | Streamlit                               |
 | Containerization | Docker + Docker Compose                 |
+
+---
+
+## 🧠 Model Selection
+
+**We use the google/flan-t5-base model for answer generation. This is a lightweight transformer-based language model from the FLAN-T5 family, designed to balance speed and accuracy. It performs well on small to medium-scale tasks and fits comfortably within 8GB RAM, which suits our development system.**
+
+**Due to hardware constraints, especially limited memory and no dedicated GPU, chunking is capped at 512 tokens, and retrieval size is optimized for efficiency. While this setup is sufficient for most use cases, it may not handle long or highly complex PDFs well.**
+
+**For users with more powerful hardware (≥16GB RAM and GPU), larger models like Mistral-7B-Instruct can be integrated for significantly better performance and deeper contextual understanding.**
 
 ---
 
