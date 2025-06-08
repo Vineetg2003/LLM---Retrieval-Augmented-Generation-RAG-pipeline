@@ -6,68 +6,51 @@ from pdf2image import convert_from_bytes
 import pytesseract
 import logging
 
-MAX_CHUNKS = 512
-
-def chunk_pdf(content: bytes, chunk_size: int = 500, overlap: int = 100, use_ocr: bool = True) -> List[str]:
-    def extract_text(pdf_bytes: bytes, ocr_enabled: bool = True) -> str:
+def chunk_pdf(content: bytes, chunks_per_page: int = 5, overlap_ratio: float = 0.2, use_ocr: bool = True) -> List[str]:
+    def extract_text_per_page(pdf_bytes: bytes, ocr_enabled: bool = True) -> List[str]:
         try:
             reader = PdfReader(BytesIO(pdf_bytes))
-            text_pages = []
+            pages_text = []
             for page in reader.pages:
                 page_text = page.extract_text()
                 if page_text:
-                    cleaned = re.sub(r'\s+', ' ', page_text)
-                    text_pages.append(cleaned.strip())
-            if text_pages:
-                return "\n\n".join(text_pages)
-
-            # Fallback to OCR only if enabled and no text extracted
-            if ocr_enabled:
+                    cleaned = re.sub(r'\s+', ' ', page_text).strip()
+                    pages_text.append(cleaned)
+                else:
+                    pages_text.append("")  # empty page
+            # OCR fallback if all pages empty
+            if all(not p for p in pages_text) and ocr_enabled:
                 images = convert_from_bytes(pdf_bytes)
-                ocr_texts = [pytesseract.image_to_string(img, lang='eng') for img in images]
-                return "\n\n".join(ocr_texts)
-            else:
-                return ""
-
+                pages_text = [pytesseract.image_to_string(img, lang='eng').strip() for img in images]
+            return pages_text
         except Exception as e:
-            raise ValueError(f"Could not extract text from PDF: {str(e)}")
+            raise ValueError(f"[chunker] Text extraction failed: {e}")
 
-    text = extract_text(content, ocr_enabled=use_ocr)
-    if not text:
-        raise ValueError("No text extracted from PDF.")
+    def chunk_text(text: str, chunk_size: int, overlap: int) -> List[str]:
+        words = text.split()
+        if len(words) <= chunk_size:
+            return [text]
+        chunks = []
+        start = 0
+        while start < len(words):
+            end = min(start + chunk_size, len(words))
+            chunk = " ".join(words[start:end])
+            chunks.append(chunk)
+            start += chunk_size - overlap
+        return chunks
 
-    paragraphs = re.split(r'(?<=[.!?])\s+|\n{2,}', text)
-    paragraphs = [p.strip() for p in paragraphs if p.strip()]
+    pages_text = extract_text_per_page(content, ocr_enabled=use_ocr)
+    all_chunks = []
 
-    chunks = []
-    current = []
-    total_len = 0
-    i = 0
-    while i < len(paragraphs):
-        para = paragraphs[i]
-        if total_len + len(para) <= chunk_size:
-            current.append(para)
-            total_len += len(para)
-            i += 1
-        else:
-            chunks.append(" ".join(current))
-            # handle overlap
-            j = len(current) - 1
-            overlap_paragraphs = []
-            overlap_len = 0
-            while j >= 0 and overlap_len < overlap:
-                overlap_paragraphs.insert(0, current[j])
-                overlap_len += len(current[j])
-                j -= 1
-            current = overlap_paragraphs
-            total_len = sum(len(p) for p in current)
+    for page_num, page_text in enumerate(pages_text, start=1):
+        if not page_text:
+            continue
+        words_count = len(page_text.split())
+        chunk_size = max(50, words_count // chunks_per_page)  # minimum chunk size 50 words
+        overlap = int(chunk_size * overlap_ratio)
+        page_chunks = chunk_text(page_text, chunk_size=chunk_size, overlap=overlap)
+        logging.info(f"[chunker] Page {page_num} split into {len(page_chunks)} chunks (chunk_size={chunk_size}, overlap={overlap})")
+        all_chunks.extend(page_chunks)
 
-        if len(chunks) >= MAX_CHUNKS:
-            logging.warning(f"Reached max chunks limit: {MAX_CHUNKS}. Stopping further chunking.")
-            break
-
-    if current and len(chunks) < MAX_CHUNKS:
-        chunks.append(" ".join(current))
-
-    logging.info(f"Extracted {len(chunks)} chunks from PDF")
-    return chunks
+    logging.info(f"[chunker] Total chunks extracted: {len(all_chunks)}")
+    return all_chunks
