@@ -3,6 +3,9 @@ from utils import upload_pdf, query_llm
 
 st.set_page_config(page_title="RAG Assistant", layout="centered")
 
+# 🔶 Highlighted Notice
+st.warning("⚠️ This frontend link fetches data from your local PC backend. So you must run the backend server on http://localhost:8000 simultaneously using the command below for the frontend to work properly:\n\n```bash\nuvicorn app.main:app --reload\n```")
+
 st.title("📄 Retrieval-Augmented Generation (RAG) Assistant")
 
 # Upload Section
