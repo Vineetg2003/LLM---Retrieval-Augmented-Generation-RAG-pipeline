@@ -90,36 +90,54 @@ sudo apt update
 sudo apt install -y poppler-utils tesseract-ocr
 
 # Clone the repo
-git clone https://github.com/yourusername/rag-pdf-qa.git
-cd rag-pdf-qa
+git clone https://github.com/Vineetg2003/LLM---Retrieval-Augmented-Generation-RAG-pipeline.git
+cd RAG-APP
 
 # Set up virtual environment
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
+cd .\backend\
+huggingface-cli login
+
+Testing Token generated from official website of Hugging Face
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Run FastAPI server
-uvicorn app.main:app --reload
+uvicorn main:app --reload --port 8000
 
 # OR Run with Docker
 docker-compose up --build
 
 .
-├── app/
-│   ├── routes.py            # API endpoints
-│   ├── chunker.py           # PDF text chunking + OCR fallback
-│   ├── retriever.py         # Semantic search using FAISS
-│   ├── llm.py               # LLM-based answer generation
-│   ├── metadata_store.py    # Metadata DB helper
-│   └── main.py              # FastAPI app entrypoint
-├── faiss_index.bin          # Persisted vector index
-├── chunks.json              # Persisted text chunks
-├── requirements.txt
-├── Dockerfile
+rag-app/
+│
+├── backend/
+│   ├── api/                     # FastAPI routes
+│   │   ├── routes.py
+│   ├── core/                    # Embedding & LLM logic
+│   │   ├── chunker.py
+│   │   ├── embedder.py
+│   │   ├── retriever.py
+│   │   ├── llm.py
+│   ├── db/
+│   │   ├── metadata_store.py    # Simple SQLite/Mongo metadata
+│   ├── main.py                  # FastAPI entrypoint
+│   ├── utils.py
+│   └── requirements.txt
+│   └── Dockerfile.backend
+│
+├── frontend/
+│   ├── app.py                   # Streamlit frontend
+│   └── requirements.txt
+│   └── Dockerfile.frontend
+│
 ├── docker-compose.yml
+├── tests/
+│   └── test_pipeline.py         # Unit tests
 └── README.md
+
 
 ```
 
